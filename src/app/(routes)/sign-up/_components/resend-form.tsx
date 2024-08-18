@@ -1,38 +1,39 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconLoader2 } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "~/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "~/ui/form";
 import { Input } from "~/ui/input";
-import { Loader2Icon } from "lucide-react";
 
 const validationSchema = z.object({
   email: z.string().trim().toLowerCase().email({
     message: "Invalid email address.",
   }),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
-  }),
 });
 
 type FormValues = z.infer<typeof validationSchema>;
 
-export const SignUpForm = () => {
+export const ResendForm = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(validationSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: "" },
   });
 
   const onSubmit = async (values: FormValues) =>
-    await fetch("/api/auth/sign-up", {
+    await fetch("/api/auth/sign-up/resend", {
       method: "POST",
       body: JSON.stringify(values),
     });
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-6">
-      <h1 className="text-4xl">Sign up</h1>
+      <h1 className="text-4xl">Your email is not verified</h1>
+      <p className="w-full max-w-sm">
+        Oops! We cannot verify your email. Would you like us to re-send the
+        verification email?
+      </p>
       <Form {...form}>
         <form
           className="flex w-full max-w-sm flex-col gap-6"
@@ -54,23 +55,11 @@ export const SignUpForm = () => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? (
-              <Loader2Icon className="mr-2 animate-spin" aria-hidden="true" />
+              <IconLoader2 className="mr-2 animate-spin" aria-hidden="true" />
             ) : null}
-            Sign up
+            Resend
           </Button>
         </form>
       </Form>

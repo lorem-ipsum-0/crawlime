@@ -1,20 +1,11 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2Icon } from "lucide-react";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "~/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "~/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "~/ui/form";
 import { Input } from "~/ui/input";
+import { IconLoader2 } from "@tabler/icons-react";
 
 const validationSchema = z.object({
   email: z.string().trim().toLowerCase().email({
@@ -27,23 +18,21 @@ const validationSchema = z.object({
 
 type FormValues = z.infer<typeof validationSchema>;
 
-export const SignInForm = () => {
-  const searchParams = useSearchParams();
-
+export const SignUpForm = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(validationSchema),
     defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = async (values: FormValues) =>
-    await signIn("credentials", {
-      ...values,
-      callbackUrl: searchParams.get("callbackUrl") ?? "/",
+    await fetch("/api/auth/sign-up", {
+      method: "POST",
+      body: JSON.stringify(values),
     });
 
   return (
-    <div className="mx-auto flex h-full flex-col items-center justify-center gap-6">
-      <h1 className="text-4xl">Sign in</h1>
+    <div className="flex h-full flex-col items-center justify-center gap-6">
+      <h1 className="text-4xl">Sign up</h1>
       <Form {...form}>
         <form
           className="flex w-full max-w-sm flex-col gap-6"
@@ -62,7 +51,6 @@ export const SignInForm = () => {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -73,18 +61,16 @@ export const SignInForm = () => {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="" {...field} />
+                  <Input type="password" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
-
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? (
-              <Loader2Icon className="mr-2 animate-spin" aria-hidden="true" />
+              <IconLoader2 className="mr-2 animate-spin" aria-hidden="true" />
             ) : null}
-            Sign in
+            Sign up
           </Button>
         </form>
       </Form>

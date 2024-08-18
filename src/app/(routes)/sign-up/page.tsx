@@ -21,8 +21,6 @@ export default async function SignIn({
         .catch((error) => ({ error }) as { data: never; error: unknown })
     : null;
 
-  console.log({ verification });
-
   return token ? (
     verification?.error ? (
       <ResendForm />

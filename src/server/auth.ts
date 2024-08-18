@@ -57,7 +57,6 @@ export const authOptions: NextAuthOptions = {
         if (!credentials) {
           return null;
         }
-        console.log({ credentials });
         const user = await db
           .select()
           .from(users)
@@ -68,12 +67,12 @@ export const authOptions: NextAuthOptions = {
             ),
           )
           .then(([res]) => res ?? null)
-          .catch((error) => {
-            console.error(error);
+          .catch((err) => {
+            console.error(err);
             return null;
           });
-        console.log({ user });
         if (user && (await compare(credentials.password, user.password))) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { password: _excludePassword, ...safeUser } = user;
           return safeUser;
         } else {

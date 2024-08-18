@@ -7,6 +7,7 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
+    TARGET_URL: z.string().url(),
     BASE_URL: z.preprocess(
       // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
       // Since NextAuth.js automatically uses the VERCEL_URL if present.
@@ -47,6 +48,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    TARGET_URL: process.env.TARGET_URL,
     BASE_URL: process.env.BASE_URL,
     DATABASE_URL: process.env.DATABASE_URL,
     GMAIL_USER: process.env.GMAIL_USER,
