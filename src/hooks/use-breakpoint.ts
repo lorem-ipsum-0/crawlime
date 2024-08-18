@@ -17,11 +17,13 @@ export const createBreakpoint =
         window.removeEventListener("resize", setSideScreen);
       };
     });
+
     const sortedBreakpoints = useMemo(
       () => Object.entries(breakpoints).sort((a, b) => (a[1] >= b[1] ? 1 : -1)),
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [breakpoints],
     ) as [keyof T, T[keyof T]][];
+
     const result = sortedBreakpoints.reduce((acc, [name, width]) => {
       if (screen >= width) {
         return name;
@@ -29,6 +31,7 @@ export const createBreakpoint =
         return acc;
       }
     }, sortedBreakpoints[0]![0]);
+
     return result;
   };
 

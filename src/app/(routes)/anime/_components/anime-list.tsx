@@ -9,11 +9,11 @@ import {
 } from "@tabler/icons-react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useBreakpoint } from "~/hooks/use-breakpoint";
+import { useClient } from "~/hooks/use-client";
 import { useDebounce } from "~/hooks/use-debounce";
-import { useIntersectionEffect } from "~/hooks/use-intersection-effect";
 import { type AnimePreview } from "~/server/crawler/anime/types";
 import { type PaginatedResponse } from "~/server/pagination";
 import { Button } from "~/ui/button";
@@ -26,15 +26,15 @@ import {
   DrawerTrigger,
 } from "~/ui/drawer";
 import { Form } from "~/ui/form";
+import InfiniteScroll from "~/ui/initifite-scroll";
 import { Input } from "~/ui/input";
 import { AnimeCard } from "./anime-card";
 import { AnimeCardSkeleton } from "./anime-card-skeleton";
 import { Filters } from "./filters";
 import { type FilterValues } from "./types";
-import { useClient } from "~/hooks/use-client";
+import { useIntersectionEffect } from "~/hooks/use-intersection-effect";
 
 export const AnimeList = () => {
-  const nextRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<FilterValues>({});
   const debouncedFilter = useDebounce(filter);
   const breakpoint = useBreakpoint();
@@ -69,13 +69,12 @@ export const AnimeList = () => {
     [],
   );
 
-  useIntersectionEffect(nextRef, () => {
-    if (hasNextPage && !isFetchingNextPage) {
+  const nextRef = useIntersectionEffect<HTMLDivElement>(() => {
+    if (hasNextPage && !isLoading && !isFetchingNextPage)
       fetchNextPage().catch(console.error);
-    }
-  }, [hasNextPage, isFetchingNextPage]);
+  }, [hasNextPage, isLoading, isFetchingNextPage]);
 
-  return client ? (
+  return (
     <Form {...form}>
       <form className="flex gap-4">
         <div className="flex-1">
@@ -115,15 +114,17 @@ export const AnimeList = () => {
             {animeList.map((item, i) => (
               <AnimeCard
                 key={item.id}
-                ref={i === animeList.length - 1 ? nextRef : undefined}
                 item={item}
+                ref={i === animeList.length - 1 ? nextRef : null}
               />
             ))}
+            {isLoading || isFetchingNextPage
+              ? [...Array<void>(11)].map((_, i) => (
+                  <AnimeCardSkeleton aria-hidden key={i} />
+                ))
+              : null}
             {isLoading || isFetchingNextPage ? (
               <>
-                {[...Array<void>(11)].map((_, i) => (
-                  <AnimeCardSkeleton key={i} />
-                ))}
                 <div role="status">
                   <span className="sr-only">Завантаження...</span>
                 </div>
@@ -134,6 +135,7 @@ export const AnimeList = () => {
             <div className="flex items-center justify-center">
               {hasNextPage ? (
                 <Button
+                  type="button"
                   variant="outline"
                   disabled={isFetchingNextPage}
                   onClick={() => {
@@ -141,7 +143,7 @@ export const AnimeList = () => {
                   }}
                 >
                   {isFetchingNextPage ? (
-                    <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <IconLoader2 className="mr-2 size-4 animate-spin" />
                   ) : null}
                   Показати більше аніме
                 </Button>
@@ -158,12 +160,12 @@ export const AnimeList = () => {
             </div>
           )}
         </div>
-        {breakpoint === "sm" || breakpoint === "md" ? null : (
+        {!client || breakpoint === "sm" || breakpoint === "md" ? null : (
           <div className="max-w-80">
             <Filters />
           </div>
         )}
       </form>
     </Form>
-  ) : null;
+  );
 };
