@@ -1,4 +1,5 @@
 "use client";
+
 import {
   IconFilter,
   IconLoader2,
@@ -30,12 +31,14 @@ import { AnimeCard } from "./anime-card";
 import { AnimeCardSkeleton } from "./anime-card-skeleton";
 import { Filters } from "./filters";
 import { type FilterValues } from "./types";
+import { useClient } from "~/hooks/use-client";
 
 export const AnimeList = () => {
   const nextRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<FilterValues>({});
   const debouncedFilter = useDebounce(filter);
   const breakpoint = useBreakpoint();
+  const client = useClient();
 
   const form = useForm<FilterValues>({});
 
@@ -72,7 +75,7 @@ export const AnimeList = () => {
     }
   }, [hasNextPage, isFetchingNextPage]);
 
-  return (
+  return client ? (
     <Form {...form}>
       <form className="flex gap-4">
         <div className="flex-1">
@@ -162,5 +165,5 @@ export const AnimeList = () => {
         )}
       </form>
     </Form>
-  );
+  ) : null;
 };

@@ -85,7 +85,7 @@ export const Playlist = ({
           );
         })}
       </div>
-      <div className="relative">
+      <div className="relative bg-accent">
         <div className="h-[56.25vw] max-h-[calc(100vh-15.625rem)] min-h-[25vw]" />
         {episodeUrl ? (
           <iframe
