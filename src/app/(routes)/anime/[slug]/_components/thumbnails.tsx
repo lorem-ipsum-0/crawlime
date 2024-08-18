@@ -58,6 +58,7 @@ export const Thumbnails = ({
           </a>
         ) : (
           <a
+            className="h-full"
             key={item.imageUrl ?? i}
             href={item.imageUrl ?? ""}
             onClick={(e) => {

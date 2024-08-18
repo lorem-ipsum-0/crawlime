@@ -39,6 +39,7 @@ import { AnimeReleaseDate } from "../../_components/release-date";
 import { AnimeVoiceAndSubs } from "../../_components/voice-and-subs";
 import { Playlist } from "./playlist";
 import { Thumbnails } from "./thumbnails";
+import { useBreakpoint } from "~/hooks/use-breakpoint";
 
 export const AnimeDetails = ({
   item,
@@ -54,6 +55,7 @@ export const AnimeDetails = ({
     }),
     {} as Record<string, string[]>,
   );
+  const breakpoint = useBreakpoint();
 
   return (
     <article className="mb-4 flex flex-col gap-y-6">
@@ -173,53 +175,62 @@ export const AnimeDetails = ({
           </h3>
           <Carousel>
             <CarouselContent>
-              {item.related.map((relatedItem) => (
-                <CarouselItem
-                  key={relatedItem.id}
-                  className="basis-1/2 md:basis-1/3 lg:basis-1/6 xl:basis-[calc(100%/8)]"
-                >
-                  <HoverCard>
-                    <HoverCardPortal>
-                      <HoverCardContent
-                        side="right"
-                        sideOffset={8}
-                        align="start"
-                        alignOffset={-2}
-                        collisionPadding={12}
-                        className="flex w-full max-w-xs flex-col gap-1 text-sm"
-                      >
-                        <div className="mb-2 text-base font-semibold leading-none tracking-tight">
-                          {relatedItem.title}
-                        </div>
-                        <AnimeReleaseDate years={item.years} />
-                        <AnimeEpisodesAndDuration
-                          currentEpisode={relatedItem.currentEpisode}
-                          totalEpisodes={relatedItem.totalEpisodes}
-                          duration={relatedItem.duration}
-                        />
-                        <AnimeVoiceAndSubs type={relatedItem.audioType} />
-                        <p className="mt-2 line-clamp-4">
-                          {relatedItem.description}
-                        </p>
-                      </HoverCardContent>
-                    </HoverCardPortal>
-                    <HoverCardTrigger asChild>
-                      <Link
-                        className="flex flex-col gap-2 text-sm"
-                        href={`/anime/${relatedItem.slug}`}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          className="aspect-[3/4] w-full rounded-xl"
-                          src={relatedItem.imageUrl ?? ""}
-                          alt=""
-                        />
-                        <div className="line-clamp-2">{relatedItem.title}</div>
-                      </Link>
-                    </HoverCardTrigger>
-                  </HoverCard>
-                </CarouselItem>
-              ))}
+              {item.related.map((relatedItem) => {
+                const renderTrigger = () => (
+                  <Link
+                    className="flex flex-col gap-2 text-sm"
+                    href={`/anime/${relatedItem.slug}`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className="aspect-[3/4] w-full rounded-xl"
+                      src={relatedItem.imageUrl ?? ""}
+                      alt=""
+                    />
+                    <div className="line-clamp-2">{relatedItem.title}</div>
+                  </Link>
+                );
+                return (
+                  <CarouselItem
+                    key={relatedItem.id}
+                    className="basis-1/2 md:basis-1/3 lg:basis-1/6 xl:basis-[calc(100%/8)]"
+                  >
+                    {breakpoint === "sm" || breakpoint === "md" ? (
+                      renderTrigger()
+                    ) : (
+                      <HoverCard>
+                        <HoverCardPortal>
+                          <HoverCardContent
+                            side="right"
+                            sideOffset={8}
+                            align="start"
+                            alignOffset={-2}
+                            collisionPadding={12}
+                            className="flex w-full max-w-xs flex-col gap-1 text-sm"
+                          >
+                            <div className="mb-2 text-base font-semibold leading-none tracking-tight">
+                              {relatedItem.title}
+                            </div>
+                            <AnimeReleaseDate years={item.years} />
+                            <AnimeEpisodesAndDuration
+                              currentEpisode={relatedItem.currentEpisode}
+                              totalEpisodes={relatedItem.totalEpisodes}
+                              duration={relatedItem.duration}
+                            />
+                            <AnimeVoiceAndSubs type={relatedItem.audioType} />
+                            <p className="mt-2 line-clamp-4">
+                              {relatedItem.description}
+                            </p>
+                          </HoverCardContent>
+                        </HoverCardPortal>
+                        <HoverCardTrigger asChild>
+                          {renderTrigger()}
+                        </HoverCardTrigger>
+                      </HoverCard>
+                    )}
+                  </CarouselItem>
+                );
+              })}
             </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />
@@ -231,7 +242,7 @@ export const AnimeDetails = ({
           <h3 className="mb-4 text-2xl font-semibold tracking-tight text-foreground">
             Рекомендації
           </h3>
-          <div className="-ml-4 -mt-4 flex flex-wrap items-center justify-center">
+          <div className="-ml-4 -mt-4 flex flex-wrap items-center justify-start">
             {item.similar.map((similarItem) => (
               <div
                 key={similarItem.id}
